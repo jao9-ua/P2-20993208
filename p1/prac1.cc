@@ -1,4 +1,5 @@
-// 20993208G Juan Andrés Orocondo Álvarez
+// DNI 20993208G Juan Andrés Orocondo ÁLvarez
+
 #include <iostream>
 #include <vector>
 #include <cstdlib>
@@ -74,6 +75,15 @@ void showMainMenu(){
 }
 
 void editProject(Project &toDoList){
+ do{
+  cout << " Enter project name: " ;
+  getline(cin,toDoList.name);
+  if(!toDoList.name.size()){
+    error(ERR_EMPTY);
+  }
+}while(!toDoList.name.size());
+cout << "Enter project description: ";
+getline(cin,toDoList.description);
 }
 
 void addList(Project &toDoList){
