@@ -87,6 +87,21 @@ getline(cin,toDoList.description);
 }
 
 void addList(Project &toDoList){
+  string x;
+ do{
+  cout << " Enter project name: " ;
+  getline(cin,x);
+  if(x.size()){
+    error(ERR_EMPTY);
+  }
+}while(x.size());
+toDoList.lists.name = x;
+if(true){
+
+}else{
+  error(ERR_LIST_NAME);
+}
+
 }
 
 void deleteList(Project &toDoList){
