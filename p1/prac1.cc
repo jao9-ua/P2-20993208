@@ -87,20 +87,31 @@ getline(cin,toDoList.description);
 }
 
 void addList(Project &toDoList){
-  string x;
+  List x;
+  int b=0;
  do{
   cout << " Enter project name: " ;
-  getline(cin,x);
-  if(x.size()){
+  getline(cin,x.name);
+  if(!x.name.size()){
     error(ERR_EMPTY);
   }
-}while(x.size());
-toDoList.lists.name = x;
-if(true){
+}while(!x.name.size());
 
-}else{
-  error(ERR_LIST_NAME);
+for(unsigned int i=0;i<toDoList.lists.size();i++){
+  if(x.name == toDoList.lists[i].name){
+    b=1;
+    error(ERR_LIST_NAME);
+  }
+  cout << toDoList.lists[i].name << endl;
 }
+if(b==0){
+  toDoList.lists.push_back(x);
+}
+
+
+
+  
+
 
 }
 
