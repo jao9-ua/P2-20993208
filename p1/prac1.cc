@@ -74,14 +74,25 @@ void showMainMenu(){
        << "Option: ";
 }
 
+string comprobar(string r){
+
+  string fun;
+  do{
+    cout << " Enter "<< r << " name: ";
+    getline(cin,fun);
+    if(!fun.size()){
+      error(ERR_EMPTY);
+    }
+  }while(!fun.size());
+
+  return fun;
+}
+
 void editProject(Project &toDoList){
- do{
-  cout << " Enter project name: " ;
-  getline(cin,toDoList.name);
-  if(!toDoList.name.size()){
-    error(ERR_EMPTY);
-  }
-}while(!toDoList.name.size());
+  string pr= "project";
+  
+  toDoList.name=comprobar(pr);
+
 cout << "Enter project description: ";
 getline(cin,toDoList.description);
 }
@@ -89,36 +100,87 @@ getline(cin,toDoList.description);
 void addList(Project &toDoList){
   List x;
   int b=0;
- do{
-  cout << " Enter project name: " ;
-  getline(cin,x.name);
-  if(!x.name.size()){
-    error(ERR_EMPTY);
+  string k= "list";
+  x.name=comprobar(k);
+  for(unsigned int i=0;i<toDoList.lists.size();i++){
+    if(x.name == toDoList.lists[i].name){
+      b=1;
+      error(ERR_LIST_NAME);
+    }
   }
-}while(!x.name.size());
-
-for(unsigned int i=0;i<toDoList.lists.size();i++){
-  if(x.name == toDoList.lists[i].name){
-    b=1;
-    error(ERR_LIST_NAME);
+  if(b==0){
+    toDoList.lists.push_back(x);
   }
-  cout << toDoList.lists[i].name << endl;
-}
-if(b==0){
-  toDoList.lists.push_back(x);
-}
-
-
-
-  
-
-
 }
 
 void deleteList(Project &toDoList){
+  string p="list";
+  int a=0;
+  string del;
+  del=comprobar(p);
+  for(unsigned int i=0;i<toDoList.lists.size();i++){
+    if(del == toDoList.lists[i].name){
+      toDoList.lists.erase(toDoList.lists.begin()+i);
+      a=1;
+    }
+    cout << toDoList.lists[i].name;
+  }
+  if(a==0){
+    error(ERR_LIST_NAME);
+  }
 }
 
 void addTask(Project &toDoList){
+  string p="list";
+  string tas;
+  string t="task";
+  Task x;
+  int b=0;
+  char q;
+  char c;
+  int a;
+  int mes;
+  int dias_mes[]= {31, 28, 31, 30,31, 30, 31, 31, 30, 31, 30, 31};
+  tas=comprobar(p);
+  for(unsigned int i=0;i<toDoList.lists.size();i++){
+    if(tas == toDoList.lists[i].name){
+      b=1;
+      a=i;
+    }else{
+      error(ERR_LIST_NAME);
+    }
+  }
+  if(b==0){
+    getline(cin,x.name);
+
+    cout << "Enter Deadline: ";
+    cin >> x.deadline.day >> q >> x.deadline.month >> c >> x.deadline.year;
+    if(x.deadline.year>2000 && x.deadline.year<2100){
+      if((x.deadline.year % 4 == 0 and x.deadline.year % 100 != 0) or x.deadline.year % 400 == 0){
+        dias_mes[1] = dias_mes[1] + 1;
+      }
+      if(x.deadline.month>=1 && x.deadline.month<=12){
+        mes = x.deadline.month-1;
+        if(x.deadline.day>=1 && x.deadline.day<=dias_mes[mes]){
+          
+
+
+
+          
+          toDoList.lists[a].tasks.push_back(x);
+        }else{
+          error(ERR_DATE);
+        }
+      }else{
+        error(ERR_DATE);
+      }
+    }else{
+      error(ERR_DATE);
+    }
+  }
+
+
+  
 }
 
 void deleteTask(Project &toDoList){
