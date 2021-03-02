@@ -257,6 +257,65 @@ void toggleTask(Project &toDoList){
 }
 
 void report(const Project &toDoList){
+  int a=0;
+  int b=0;
+  int c=0;
+  int d=0;
+  Task compr;
+  compr.deadline.year=2101;
+  compr.deadline.month=13;
+  compr.deadline.day=32;
+  cout << "Name: " << toDoList.name << endl;
+  if(!toDoList.description.size()){
+
+  }else{
+    cout << "Description: " << toDoList.description << endl;
+  }
+  for(unsigned int i=0; i<toDoList.lists.size();i++){
+    cout << toDoList.lists[i].name << endl;
+    for(unsigned int z=0; z<toDoList.lists[i].tasks.size();z++){
+      if(toDoList.lists[i].tasks[z].isDone==false){
+        cout << "[ ]" << " " << "(" << toDoList.lists[i].tasks[z].time << ")" << toDoList.lists[i].tasks[z].deadline.year << "-" << toDoList.lists[i].tasks[z].deadline.month;
+        cout  << "-" << toDoList.lists[i].tasks[z].deadline.day << " : " << toDoList.lists[i].tasks[z].name << endl;
+        a=a+1;
+        c=c+toDoList.lists[i].tasks[z].time;
+      }
+    }
+    for(unsigned int z=0; z<toDoList.lists[i].tasks.size();z++){
+      if(toDoList.lists[i].tasks[z].isDone==true){
+        cout << "[X]" << " " << "(" << toDoList.lists[i].tasks[z].time << ")" << toDoList.lists[i].tasks[z].deadline.year << "-" << toDoList.lists[i].tasks[z].deadline.month;
+        cout  << "-" << toDoList.lists[i].tasks[z].deadline.day << " : " << toDoList.lists[i].tasks[z].name << endl;
+        b=b+1;
+        d=d+toDoList.lists[i].tasks[z].time;
+      }
+  }
+  cout << "Total left: " << a << " (" << c << " minutes)" << endl;
+  cout << "Total done: " << b << " (" << d << " minutes)" << endl;
+
+  if(a!=0){
+    for(unsigned int i=0;i<toDoList.lists.size();i++){
+      for(unsigned int z=0;z<toDoList.lists[i].tasks.size();z++){
+        if(compr.deadline.year>toDoList.lists[i].tasks[z].deadline.year){
+          compr=toDoList.lists[i].tasks[z];
+        }else{
+          if(compr.deadline.year==toDoList.lists[i].tasks[z].deadline.year && compr.deadline.month>toDoList.lists[i].tasks[z].deadline.month){
+            compr=toDoList.lists[i].tasks[z];
+          }else{
+            if(compr.deadline.month==toDoList.lists[i].tasks[z].deadline.month && compr.deadline.day>toDoList.lists[i].tasks[z].deadline.day){
+              compr=toDoList.lists[i].tasks[z];
+            }
+          }
+        }
+      }
+    }
+
+
+  }
+  cout << "Highest priority: " << compr.name << " (" << compr.deadline.year << "-" << compr.deadline.month << "-" << compr.deadline.day << endl;
+
+
+
+  }
 }
 
 int main(){
