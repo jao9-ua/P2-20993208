@@ -146,11 +146,11 @@ void addTask(Project &toDoList){
     if(tas == toDoList.lists[i].name){
       b=1;
       a=i;
-    }else{
-      error(ERR_LIST_NAME);
     }
   }
-  if(b==0){
+  if(b==1){
+
+    cout << "Enter task name:";
     getline(cin,x.name);
 
     cout << "Enter Deadline: ";
@@ -162,12 +162,16 @@ void addTask(Project &toDoList){
       if(x.deadline.month>=1 && x.deadline.month<=12){
         mes = x.deadline.month-1;
         if(x.deadline.day>=1 && x.deadline.day<=dias_mes[mes]){
-          
 
+          cout << "Enter expected line: " << endl;
+          cin >> x.time;
+          if(x.time>=1 && x.time <=180){
+            x.isDone=false;
+            toDoList.lists[a].tasks.push_back(x);
 
-
-          
-          toDoList.lists[a].tasks.push_back(x);
+          }else{
+            error(ERR_TIME);
+          }
         }else{
           error(ERR_DATE);
         }
@@ -177,6 +181,8 @@ void addTask(Project &toDoList){
     }else{
       error(ERR_DATE);
     }
+  }else{
+    error(ERR_LIST_NAME);
   }
 
 
@@ -184,9 +190,70 @@ void addTask(Project &toDoList){
 }
 
 void deleteTask(Project &toDoList){
+  string p="list";
+  string q="task";
+  string x;
+  string t;
+  int a=0;
+  int b=0;
+  int k=0;
+  x=comprobar(p);
+  for(unsigned int i=0;i<toDoList.lists.size();i++){
+    if(x == toDoList.lists[i].name){
+      b=1;
+      a=i;
+    }
+  }
+  if(b==1){
+    t=comprobar(q);
+    for(unsigned int e=0;e<toDoList.lists[a].tasks.size();e++){
+      if(q==toDoList.lists[a].tasks[e].name){
+        toDoList.lists[a].tasks.erase(toDoList.lists[a].tasks.begin()+e);
+        k=1;
+      }
+    }
+
+  }else{
+    error(ERR_LIST_NAME);
+  }
+  if(k==0){
+    error(ERR_TASK_NAME);
+  }
 }
 
 void toggleTask(Project &toDoList){
+  string p="list";
+  string q="task";
+  string x;
+  string t;
+  int a;
+  int b=0;
+  int r=0;
+  x=comprobar(p);
+  for(unsigned int i=0;i<toDoList.lists.size();i++){
+    if(x == toDoList.lists[i].name){
+      b=1;
+      a=i;
+    }
+  }
+  if(b==1){
+    t=comprobar(q);
+    for(unsigned int e=0;e<toDoList.lists[a].tasks.size();e++){
+      if(t==toDoList.lists[a].tasks[e].name){
+        if(toDoList.lists[a].tasks[e].isDone==false){
+          toDoList.lists[a].tasks[e].isDone=true;
+        }else{
+          toDoList.lists[a].tasks[e].isDone=false;
+        }
+        r=1;
+      }
+    }
+  }else{
+    error(ERR_LIST_NAME);
+  }
+  if(r==0){
+    error(ERR_TASK_NAME);
+  }
 }
 
 void report(const Project &toDoList){
