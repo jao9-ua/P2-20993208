@@ -78,7 +78,7 @@ string comprobar(string r){
 
   string fun;
   do{
-    cout << " Enter "<< r << " name: ";
+    cout << "Enter "<< r << " name: ";
     getline(cin,fun);
     if(!fun.size()){
       error(ERR_EMPTY);
@@ -123,7 +123,6 @@ void deleteList(Project &toDoList){
       toDoList.lists.erase(toDoList.lists.begin()+i);
       a=1;
     }
-    cout << toDoList.lists[i].name;
   }
   if(a==0){
     error(ERR_LIST_NAME);
@@ -150,10 +149,10 @@ void addTask(Project &toDoList){
   }
   if(b==1){
 
-    cout << "Enter task name:";
+    cout << "Enter task name: ";
     getline(cin,x.name);
 
-    cout << "Enter Deadline: ";
+    cout << "Enter deadline: ";
     cin >> x.deadline.day >> q >> x.deadline.month >> c >> x.deadline.year;
     if(x.deadline.year>2000 && x.deadline.year<2100){
       if((x.deadline.year % 4 == 0 and x.deadline.year % 100 != 0) or x.deadline.year % 400 == 0){
@@ -163,7 +162,7 @@ void addTask(Project &toDoList){
         mes = x.deadline.month-1;
         if(x.deadline.day>=1 && x.deadline.day<=dias_mes[mes]){
 
-          cout << "Enter expected line: " << endl;
+          cout << "Enter expected time: ";
           cin >> x.time;
           if(x.time>=1 && x.time <=180){
             x.isDone=false;
@@ -207,7 +206,7 @@ void deleteTask(Project &toDoList){
   if(b==1){
     t=comprobar(q);
     for(unsigned int e=0;e<toDoList.lists[a].tasks.size();e++){
-      if(q==toDoList.lists[a].tasks[e].name){
+      if(t==toDoList.lists[a].tasks[e].name){
         toDoList.lists[a].tasks.erase(toDoList.lists[a].tasks.begin()+e);
         k=1;
       }
@@ -288,20 +287,21 @@ void report(const Project &toDoList){
         b=b+1;
         d=d+toDoList.lists[i].tasks[z].time;
       }
+    }
   }
   cout << "Total left: " << a << " (" << c << " minutes)" << endl;
   cout << "Total done: " << b << " (" << d << " minutes)" << endl;
 
-  if(a!=0){
+  if(a>0){
     for(unsigned int i=0;i<toDoList.lists.size();i++){
       for(unsigned int z=0;z<toDoList.lists[i].tasks.size();z++){
-        if(compr.deadline.year>toDoList.lists[i].tasks[z].deadline.year){
+        if(compr.deadline.year>toDoList.lists[i].tasks[z].deadline.year && toDoList.lists[i].tasks[z].isDone==false){
           compr=toDoList.lists[i].tasks[z];
         }else{
-          if(compr.deadline.year==toDoList.lists[i].tasks[z].deadline.year && compr.deadline.month>toDoList.lists[i].tasks[z].deadline.month){
+          if(compr.deadline.year==toDoList.lists[i].tasks[z].deadline.year && compr.deadline.month>toDoList.lists[i].tasks[z].deadline.month && toDoList.lists[i].tasks[z].isDone==false){
             compr=toDoList.lists[i].tasks[z];
           }else{
-            if(compr.deadline.month==toDoList.lists[i].tasks[z].deadline.month && compr.deadline.day>toDoList.lists[i].tasks[z].deadline.day){
+            if(compr.deadline.month==toDoList.lists[i].tasks[z].deadline.month && compr.deadline.day>toDoList.lists[i].tasks[z].deadline.day && toDoList.lists[i].tasks[z].isDone==false){
               compr=toDoList.lists[i].tasks[z];
             }
           }
@@ -309,14 +309,14 @@ void report(const Project &toDoList){
       }
     }
 
+    cout << "Highest priority: " << compr.name << " (" << compr.deadline.year << "-" << compr.deadline.month << "-" << compr.deadline.day << ")" << endl;
+  }
+  
+
+
 
   }
-  cout << "Highest priority: " << compr.name << " (" << compr.deadline.year << "-" << compr.deadline.month << "-" << compr.deadline.day << endl;
 
-
-
-  }
-}
 
 int main(){
   Project toDoList;
