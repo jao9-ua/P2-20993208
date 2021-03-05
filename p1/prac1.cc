@@ -6,6 +6,8 @@
 
 using namespace std;
 
+const int ANYMAX=2101; //Introducir el año deseado sumandole 1 para el correcto funcionamiento del programa
+
 struct Date{
   int day;
   int month;
@@ -74,6 +76,7 @@ void showMainMenu(){
        << "Option: ";
 }
 
+// Función para comprobar que la entrada de texto no esta vacía
 string comprobar(string r){
 
   string fun;
@@ -102,6 +105,8 @@ void addList(Project &toDoList){
   int b=0;
   string k= "list";
   x.name=comprobar(k);
+  
+  //recorre todas las listas en busca de alguna con el mismo nombre si no hay añadira la lista deseada
   for(unsigned int i=0;i<toDoList.lists.size();i++){
     if(x.name == toDoList.lists[i].name){
       b=1;
@@ -141,6 +146,7 @@ void addTask(Project &toDoList){
   int mes;
   int dias_mes[]= {31, 28, 31, 30,31, 30, 31, 31, 30, 31, 30, 31};
   tas=comprobar(p);
+
   for(unsigned int i=0;i<toDoList.lists.size();i++){
     if(tas == toDoList.lists[i].name){
       b=1;
@@ -154,7 +160,8 @@ void addTask(Project &toDoList){
 
     cout << "Enter deadline: ";
     cin >> x.deadline.day >> q >> x.deadline.month >> c >> x.deadline.year;
-    if(x.deadline.year>2000 && x.deadline.year<2100){
+    // comprobacion de que la fecha introducida es correcta
+    if(x.deadline.year>2000 && x.deadline.year<ANYMAX){
       if((x.deadline.year % 4 == 0 and x.deadline.year % 100 != 0) or x.deadline.year % 400 == 0){
         dias_mes[1] = dias_mes[1] + 1;
       }
@@ -197,12 +204,17 @@ void deleteTask(Project &toDoList){
   int b=0;
   int k=0;
   x=comprobar(p);
+
   for(unsigned int i=0;i<toDoList.lists.size();i++){
     if(x == toDoList.lists[i].name){
       b=1;
       a=i;
     }
   }
+  /* Si en el bucle anterior ha detectado una lista con el texto introducido entrara en el siguiente bucle
+  **que despues de introducir la tarea buscara si existe dicha tarea en la lista seleccionada y eliminara la tarea
+  **en caso contrario nos dara error
+  */
   if(b==1){
     t=comprobar(q);
     for(unsigned int e=0;e<toDoList.lists[a].tasks.size();e++){
@@ -235,6 +247,9 @@ void toggleTask(Project &toDoList){
       a=i;
     }
   }
+  /*si se cumple que hay una lista igual al texto introducido se pedira una tarea
+  **si coincide con alguna de las tareas de la lista cambiara el valor de isDone
+  */
   if(b==1){
     t=comprobar(q);
     for(unsigned int e=0;e<toDoList.lists[a].tasks.size();e++){
@@ -256,12 +271,12 @@ void toggleTask(Project &toDoList){
 }
 
 void report(const Project &toDoList){
-  int a=0;
-  int b=0;
-  int c=0;
-  int d=0;
-  Task compr;
-  compr.deadline.year=2101;
+  int a=0;//variable para tareas incompletas
+  int b=0;//variable para tareas completas
+  int c=0;//v. para la suma de las tareas incompletas
+  int d=0;//v. para la suma de las tareas completas
+  Task compr;//esta variable la usaremos para el highest priority
+  compr.deadline.year=ANYMAX;
   compr.deadline.month=13;
   compr.deadline.day=32;
   cout << "Name: " << toDoList.name << endl;
@@ -270,8 +285,11 @@ void report(const Project &toDoList){
   }else{
     cout << "Description: " << toDoList.description << endl;
   }
+  //Se recorre todas las listas y sus tareas
   for(unsigned int i=0; i<toDoList.lists.size();i++){
     cout << toDoList.lists[i].name << endl;
+
+    //Bucle que muestra las tareas incompletas de una lista
     for(unsigned int z=0; z<toDoList.lists[i].tasks.size();z++){
       if(toDoList.lists[i].tasks[z].isDone==false){
         cout << "[ ]" << " " << "(" << toDoList.lists[i].tasks[z].time << ")" << toDoList.lists[i].tasks[z].deadline.year << "-" << toDoList.lists[i].tasks[z].deadline.month;
@@ -280,6 +298,8 @@ void report(const Project &toDoList){
         c=c+toDoList.lists[i].tasks[z].time;
       }
     }
+
+    //Bucle que muestra las tareas completas de la misma lista
     for(unsigned int z=0; z<toDoList.lists[i].tasks.size();z++){
       if(toDoList.lists[i].tasks[z].isDone==true){
         cout << "[X]" << " " << "(" << toDoList.lists[i].tasks[z].time << ")" << toDoList.lists[i].tasks[z].deadline.year << "-" << toDoList.lists[i].tasks[z].deadline.month;
@@ -292,6 +312,7 @@ void report(const Project &toDoList){
   cout << "Total left: " << a << " (" << c << " minutes)" << endl;
   cout << "Total done: " << b << " (" << d << " minutes)" << endl;
 
+  //si existe alguna tarea incompleta mostrara por pantalla la tarea mas prioritaria
   if(a>0){
     for(unsigned int i=0;i<toDoList.lists.size();i++){
       for(unsigned int z=0;z<toDoList.lists[i].tasks.size();z++){
