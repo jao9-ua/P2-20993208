@@ -161,14 +161,13 @@ void addTask(Project &toDoList){
     cout << "Enter deadline: ";
     cin >> x.deadline.day >> q >> x.deadline.month >> c >> x.deadline.year;
     // comprobacion de que la fecha introducida es correcta
-    if(x.deadline.year>2000 && x.deadline.year<ANYMAX){
+    if(x.deadline.year>=2000 && x.deadline.year<ANYMAX){
       if((x.deadline.year % 4 == 0 and x.deadline.year % 100 != 0) or x.deadline.year % 400 == 0){
         dias_mes[1] = dias_mes[1] + 1;
       }
       if(x.deadline.month>=1 && x.deadline.month<=12){
         mes = x.deadline.month-1;
         if(x.deadline.day>=1 && x.deadline.day<=dias_mes[mes]){
-
           cout << "Enter expected time: ";
           cin >> x.time;
           if(x.time>=1 && x.time <=180){
