@@ -196,12 +196,11 @@ void addTask(Project &toDoList){
 
 void deleteTask(Project &toDoList){
   string p="list";
-  string q="task";
   string x;
   string t;
   int a=0;
   int b=0;
-  int k=0;
+  bool k=true;
   x=comprobar(p);
 
   for(unsigned int i=0;i<toDoList.lists.size();i++){
@@ -215,25 +214,27 @@ void deleteTask(Project &toDoList){
   **en caso contrario nos dara error
   */
   if(b==1){
-    t=comprobar(q);
+    cout << "Enter task name: ";
+    getline(cin,t);
     for(unsigned int e=0;e<toDoList.lists[a].tasks.size();e++){
-      if(t==toDoList.lists[a].tasks[e].name){
+      if(t == toDoList.lists[a].tasks[e].name){
         toDoList.lists[a].tasks.erase(toDoList.lists[a].tasks.begin()+e);
-        k=1;
+        k=false;
+        e=-1;
       }
+    }
+    if(k){
+      error(ERR_TASK_NAME);
     }
 
   }else{
     error(ERR_LIST_NAME);
   }
-  if(k==0){
-    error(ERR_TASK_NAME);
-  }
+
 }
 
 void toggleTask(Project &toDoList){
   string p="list";
-  string q="task";
   string x;
   string t;
   int a;
@@ -250,7 +251,8 @@ void toggleTask(Project &toDoList){
   **si coincide con alguna de las tareas de la lista cambiara el valor de isDone
   */
   if(b==1){
-    t=comprobar(q);
+    cout << "Enter task name: ";
+    getline(cin,t);
     for(unsigned int e=0;e<toDoList.lists[a].tasks.size();e++){
       if(t==toDoList.lists[a].tasks[e].name){
         if(toDoList.lists[a].tasks[e].isDone==false){
@@ -261,12 +263,13 @@ void toggleTask(Project &toDoList){
         r=1;
       }
     }
+    if(r==0){
+      error(ERR_TASK_NAME);
+    }
   }else{
     error(ERR_LIST_NAME);
   }
-  if(r==0){
-    error(ERR_TASK_NAME);
-  }
+
 }
 
 void report(const Project &toDoList){
@@ -291,7 +294,7 @@ void report(const Project &toDoList){
     //Bucle que muestra las tareas incompletas de una lista
     for(unsigned int z=0; z<toDoList.lists[i].tasks.size();z++){
       if(toDoList.lists[i].tasks[z].isDone==false){
-        cout << "[ ]" << " " << "(" << toDoList.lists[i].tasks[z].time << ")" << toDoList.lists[i].tasks[z].deadline.year << "-" << toDoList.lists[i].tasks[z].deadline.month;
+        cout << "[ ]" << " " << "(" << toDoList.lists[i].tasks[z].time << ") " << toDoList.lists[i].tasks[z].deadline.year << "-" << toDoList.lists[i].tasks[z].deadline.month;
         cout  << "-" << toDoList.lists[i].tasks[z].deadline.day << " : " << toDoList.lists[i].tasks[z].name << endl;
         a=a+1;
         c=c+toDoList.lists[i].tasks[z].time;
@@ -301,7 +304,7 @@ void report(const Project &toDoList){
     //Bucle que muestra las tareas completas de la misma lista
     for(unsigned int z=0; z<toDoList.lists[i].tasks.size();z++){
       if(toDoList.lists[i].tasks[z].isDone==true){
-        cout << "[X]" << " " << "(" << toDoList.lists[i].tasks[z].time << ")" << toDoList.lists[i].tasks[z].deadline.year << "-" << toDoList.lists[i].tasks[z].deadline.month;
+        cout << "[X]" << " " << "(" << toDoList.lists[i].tasks[z].time << ") " << toDoList.lists[i].tasks[z].deadline.year << "-" << toDoList.lists[i].tasks[z].deadline.month;
         cout  << "-" << toDoList.lists[i].tasks[z].deadline.day << " : " << toDoList.lists[i].tasks[z].name << endl;
         b=b+1;
         d=d+toDoList.lists[i].tasks[z].time;
