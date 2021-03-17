@@ -324,7 +324,7 @@ void report(const Project &toDoList){
           if(compr.deadline.year==toDoList.lists[i].tasks[z].deadline.year && compr.deadline.month>toDoList.lists[i].tasks[z].deadline.month && toDoList.lists[i].tasks[z].isDone==false){
             compr=toDoList.lists[i].tasks[z];
           }else{
-            if(compr.deadline.month==toDoList.lists[i].tasks[z].deadline.month && compr.deadline.day>toDoList.lists[i].tasks[z].deadline.day && toDoList.lists[i].tasks[z].isDone==false){
+            if(compr.deadline.year==toDoList.lists[i].tasks[z].deadline.year && compr.deadline.month==toDoList.lists[i].tasks[z].deadline.month && compr.deadline.day>toDoList.lists[i].tasks[z].deadline.day && toDoList.lists[i].tasks[z].isDone==false){
               compr=toDoList.lists[i].tasks[z];
             }
           }
