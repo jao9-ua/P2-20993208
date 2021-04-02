@@ -10,6 +10,31 @@ const int ANYMAX=2101; //Introducir el año deseado sumandole 1 para el correcto
 const int KMAXNAME=20;
 const int KMAXDESC=40;
 
+struct Date{
+  int day;
+  int month;
+  int year;
+};
+
+struct Task{
+  string name;
+  Date deadline;
+  bool isDone;
+  int time;
+};
+
+struct List{
+  string name;
+  vector<Task> tasks;
+};
+
+struct Project{
+  int id;
+  string name;
+  string description;
+  vector<List> lists;
+};
+
 struct BinToDo{
   char name[KMAXNAME];
   unsigned numProjects;
@@ -38,31 +63,6 @@ struct ToDo{
   int nextId;
   string name;
   vector<Project> projects;
-};
-
-struct Date{
-  int day;
-  int month;
-  int year;
-};
-
-struct Task{
-  string name;
-  Date deadline;
-  bool isDone;
-  int time;
-};
-
-struct List{
-  string name;
-  vector<Task> tasks;
-};
-
-struct Project{
-  int id;
-  string name;
-  string description;
-  vector<List> lists;
 };
 
 enum Error{
@@ -120,7 +120,7 @@ void showProjectMenu(){
        << "5- Delete task" << endl
        << "6- Toggle task" << endl
        << "7- Report" << endl
-       << "q- Quit" << endl
+       << "b- Back to main menu" << endl
        << "Option: ";
 }
 
@@ -399,12 +399,99 @@ void report(const Project &toDoList){
 
 
 
+}
+
+void projectMenu(ToDo &x){
+  int id;
+  cout << "Enter project id: ";
+  cin >> id;
+  for(unsigned int i=0;i<x.projects.size();i++){
+    if(id==x.projects[i].id){
+      char option;
+      do{
+        showProjectMenu();
+        
+        cin >> option;
+        cin.get();
+        
+        switch(option){
+          case '1': editProject(x.projects[i]);
+                    break;
+          case '2': addList(x.projects[i]);
+                    break;
+          case '3': deleteList(x.projects[i]);
+                    break;
+          case '4': addTask(x.projects[i]);
+                    break;
+          case '5': deleteTask(x.projects[i]);
+                    break;
+          case '6': toggleTask(x.projects[i]);
+                    break;
+          case '7': report(x.projects[i]);
+                    break;
+          case 'b': break;
+          default: error(ERR_OPTION);
+        }
+      }while(option!='b');
+    }
   }
+
+}
+void addProject(ToDo &x){
+  string compr="project";
+  Project proyecto;
+  bool a=true;
+  proyecto.name=comprobar(compr);
+  for(unsigned int i=0;i<x.projects.size();i++){
+    if(proyecto.name==x.projects[i].name){
+      a=false;
+    }
+  }
+  if(a){
+    cout <<"Enter project description: ";
+    getline(cin,proyecto.description);
+    proyecto.id=x.nextId;
+    x.nextId++;
+    x.projects.push_back(proyecto);
+  }else{
+    error(ERR_PROJECT_NAME);
+  }
+}
+void deleteProject(ToDo &x){
+  int id;
+  bool a;
+  cout <<"Enter project id: ";
+  cin >> id;
+  for(unsigned int i=0; i<x.projects.size();i++){
+    if(id==x.projects[i].nextId){
+      x.projects.erase(x.projects.begin()+i);
+      a=false;
+    }
+  }
+  if(a){
+    error(ERR_ID);
+  }
+}
+
+void importProject(ToDo &x){
+  cout <<"Enter filename ";
+  
+}
+void exportProject(ToDo &x){
+
+}
+void loadData(ToDo &x){
+
+}
+void saveData(ToDo &x){
+
+}
+void summary(ToDo &x){
+
+}
 
 
 int main(){
-  Project toDoList;
-  toDoList.id=1;
   char option;
   ToDo x;
   x.nextId = 1;
@@ -417,21 +504,21 @@ int main(){
     cin.get();
     
     switch(option){
-      case '1': projectMenu(toDoList);
+      case '1': projectMenu(x);
                 break;
-      case '2': addProject(toDoList);
+      case '2': addProject(x);
                 break;
-      case '3': deleteProject(toDoList);
+      case '3': deleteProject(x);
                 break;
-      case '4': importProject(toDoList);
+      case '4': importProject(x);
                 break;
-      case '5': exportProject(toDoList);
+      case '5': exportProject(x);
                 break;
-      case '6': loadData(toDoList);
+      case '6': loadData(x);
                 break;
-      case '7': saveData(toDoList);
+      case '7': saveData(x);
                 break;
-      case '8': summary(toDoList);
+      case '8': summary(x);
                 break;
       case 'q': break;
       default: error(ERR_OPTION);
