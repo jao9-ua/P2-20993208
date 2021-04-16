@@ -181,7 +181,7 @@ bool comprobarFecha(Task x){
 }
 
 bool comprobarTiempo(Task x){
-  bool a=false;
+  bool a;
   if(x.time>=1 && x.time <=180){
     a=true;
   }else{
@@ -460,7 +460,7 @@ void projectMenu(ToDo &x){
 
 }
 void addProject(ToDo &x){
-  string compr="project ";
+  string compr="project";
   Project proyecto;
   bool a=true;
   proyecto.name=comprobar(compr);
@@ -470,7 +470,7 @@ void addProject(ToDo &x){
     }
   }
   if(a){
-    cout <<"Enter project  description: ";
+    cout <<"Enter project description: ";
     getline(cin,proyecto.description);
     proyecto.id=x.nextId;
     x.nextId++;
@@ -481,8 +481,8 @@ void addProject(ToDo &x){
 }
 void deleteProject(ToDo &x){
   int id;
-  bool a=true;
-  cout <<"Enter project  id: ";
+  bool a;
+  cout <<"Enter project id: ";
   cin >> id;
   for(unsigned int i=0; i<x.projects.size();i++){
     if(id==x.projects[i].id){
@@ -495,18 +495,15 @@ void deleteProject(ToDo &x){
   }
 }
 
-void importProject(ToDo &x, string argv){
+void importProject(ToDo &x){
   string nombreFichero;
   char comprobar;
   ifstream f1;
   string texto;
- if(!argv.empty()){
-  f1.open(argv.c_str());
- }else{
+ 
   cout <<"Enter filename: ";
   getline(cin,nombreFichero);
-  f1.open(nombreFichero.c_str());}
-
+  f1.open(nombreFichero.c_str());
   if(f1.is_open()){
     f1 >> comprobar;
     do{
@@ -534,10 +531,6 @@ void importProject(ToDo &x, string argv){
             comprobar='\0';
             getline(f1,texto);
             lista.name=texto;
-            f1.get(comprobar);
-            if(comprobar!='>'){
-              a=comprobar;
-            }
             while(a!='@' && comprobar!='>'){
               Task tarea;
               while(a!='|'){
@@ -586,13 +579,13 @@ void importProject(ToDo &x, string argv){
 void exportProject(ToDo &x){
   char guardar;
   int id;
-  bool a=false;
+  bool a;
   bool existe=false;
   string nF;
   ofstream fichero;
   string str;
   do{
-    cout << "Save all projects [Y/N]?:";
+    cout << "Save all project [Y/N]?:";
     cin >> guardar;
   }while(guardar!='Y' && guardar!='y' && guardar!='N' && guardar!='n');
   cin.ignore();
@@ -618,13 +611,10 @@ void exportProject(ToDo &x){
       if(existe){
         for(unsigned int d=0;d<x.projects.size();d++){
           if(id==x.projects[d].id){
-            fichero << "<" << endl;
-            fichero <<"#"<< x.projects[d].name << endl;
-            if(!x.projects[d].description.empty()){
-              fichero <<"*"<< x.projects[d].description << endl;
-            }
+            fichero << x.projects[d].name << endl;
+            fichero << x.projects[d].description << endl;
             for(unsigned int i=0;i< x.projects[d].lists.size();i++){
-              fichero <<"@"<< x.projects[d].lists[i].name << endl;
+              fichero << x.projects[d].lists[i].name << endl;
               for(unsigned int a=0;a<x.projects[d].lists[i].tasks.size();a++){
                 fichero << x.projects[d].lists[i].tasks[a].name << "|" << x.projects[d].lists[i].tasks[a].deadline.day << "/";
                 fichero << x.projects[d].lists[i].tasks[a].deadline.month << "/";
@@ -635,36 +625,29 @@ void exportProject(ToDo &x){
                   fichero << "F" << "|";
                 }
                 fichero << x.projects[id].lists[i].tasks[a].time << endl;
-                
               }
             }
-            fichero << ">" << endl;
           }
         }
       }else{
         for(unsigned int d=0;d<x.projects.size();d++){
-          fichero << "<" << endl;
-          fichero <<"#"<< x.projects[d].name << endl;
-          if(!x.projects[d].description.empty()){
-            fichero <<"*"<< x.projects[d].description << endl;
-          }
+          fichero << x.projects[d].name << endl;
+          fichero << x.projects[d].description << endl;
           for(unsigned int i=0;i<x.projects[d].lists.size();i++){
-            fichero <<"@"<< x.projects[d].lists[i].name << endl;
+            fichero << x.projects[d].lists[i].name << endl;
             for(unsigned int a=0;a<x.projects[d].lists[i].tasks.size();a++){
               fichero << x.projects[d].lists[i].tasks[a].name << "|";
               fichero << x.projects[d].lists[i].tasks[a].deadline.day << "/";
               fichero << x.projects[d].lists[i].tasks[a].deadline.month << "/";
               fichero << x.projects[d].lists[i].tasks[a].deadline.year << "|";
               if(x.projects[d].lists[i].tasks[a].isDone){
-                fichero << "T" << "|";
+                fichero << "T" << "/";
               }else{
-                fichero << "F" << "|";
+                fichero << "F" << "/";
               }
               fichero << x.projects[d].lists[i].tasks[a].time << endl;
-              
             }
           }
-          fichero << ">" << endl;
         }
       }
       fichero.close();
@@ -676,7 +659,7 @@ void exportProject(ToDo &x){
   }
 }
 
-void loadData(ToDo &x, string argv){
+void loadData(ToDo &x){
   string nombreFichero;
   BinToDo p;
   BinProject project;
@@ -745,7 +728,6 @@ void saveData(ToDo &x){
   cout << "Enter filename: ";
   getline(cin,nombreFichero);
   fichero.open(nombreFichero.c_str(),ios::binary);
-
   if(fichero.is_open()){
     strncpy(p.name,x.name.c_str(),KMAXNAME-1);
     p.name[KMAXNAME-1]='\0';
@@ -759,20 +741,17 @@ void saveData(ToDo &x){
       strncpy(project.description,x.projects[i].description.c_str(),KMAXDESC-1);
       project.description[KMAXDESC-1]='\0';
 
-      project.numLists=x.projects[i].lists.size();
       fichero.write((const char *)&project, sizeof(project));
 
-      
-      
+      project.numLists=x.projects[i].lists.size();
 
       for(unsigned int d=0;d<x.projects[i].lists.size();d++){
         strncpy(lista.name,x.projects[i].lists[d].name.c_str(),KMAXNAME-1);
         lista.name[KMAXNAME-1]='\0';
-        lista.numTasks=x.projects[i].lists[d].tasks.size();
 
         fichero.write((const char *)&lista, sizeof(lista));
 
-        
+        lista.numTasks=x.projects[i].lists[d].tasks.size();
 
         for(unsigned int z=0;z<x.projects[i].lists[d].tasks.size();z++){
           strncpy(tarea.name,x.projects[i].lists[d].tasks[z].name.c_str(),KMAXNAME-1);
@@ -787,59 +766,42 @@ void saveData(ToDo &x){
         }
       }
     }
-    fichero.close();
   }else{
     error(ERR_FILE);
   }
 }
 void summary(ToDo &x){
-
+  int contadortareas=0;
+  int contadorHechas=0;
   for(unsigned int i=0;i<x.projects.size();i++){
-    int contadortareas=0;
-    int contadorHechas=0;
     cout << "(" << x.projects[i].id <<") "<< x.projects[i].name;
     for(unsigned int b=0;b<x.projects[i].lists.size();b++){
       for(unsigned int z=0;z<x.projects[i].lists[b].tasks.size();z++){
         if(x.projects[i].lists[b].tasks[z].isDone){
-          contadorHechas++;
-          contadortareas++;
+          contadorHechas=contadorHechas+1;
+          contadortareas=contadortareas+1;
         }else{
-          contadortareas++;
+          contadortareas=contadortareas+1;
         }
       }
     }
     cout << " [" << contadorHechas << "/" << contadortareas << "]" << endl;
   }
 }
-int main(int argc, char* argv[]){
-  char option='\0';
+
+
+int main(){
+  char option;
   ToDo x;
-  bool z=true;
   x.nextId = 1;
-  string b;
-  string c;
   x.name = "My ToDo list";
-  if(argc>1){
-    b=argv[2];
-    if(b=="-i"){
-      c=argv[3];
-      importProject(x,c);
-    }else{
-      if(b=="-l"){
-        c=argv[3];
-        loadData(x,c);
-      }else{
-        error(ERR_ARGS);
-        z=false;
-      }
-    }
-  }
-  if(z){
+
+  
   do{
     showMainMenu();
     cin >> option;
     cin.get();
-
+    
     switch(option){
       case '1': projectMenu(x);
                 break;
@@ -847,11 +809,11 @@ int main(int argc, char* argv[]){
                 break;
       case '3': deleteProject(x);
                 break;
-      case '4': importProject(x,b);
+      case '4': importProject(x);
                 break;
       case '5': exportProject(x);
                 break;
-      case '6': loadData(x,b);
+      case '6': loadData(x);
                 break;
       case '7': saveData(x);
                 break;
@@ -861,6 +823,6 @@ int main(int argc, char* argv[]){
       default: error(ERR_OPTION);
     }
   }while(option!='q');
-}
+  
   return 0;    
 }
