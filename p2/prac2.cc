@@ -1,8 +1,10 @@
 // DNI 20993208G Juan Andrés Orocondo ÁLvarez
 
+#include <fstream>
 #include <iostream>
 #include <vector>
 #include <cstdlib>
+
 
 using namespace std;
 
@@ -152,6 +154,40 @@ string comprobar(string r){
   return fun;
 }
 
+bool comprobarFecha(Task x){
+  int mes;
+  int dias_mes[]= {31, 28, 31, 30,31, 30, 31, 31, 30, 31, 30, 31};
+  bool a;
+  if(x.deadline.year>=2000 && x.deadline.year<ANYMAX){
+    if((x.deadline.year % 4 == 0 and x.deadline.year % 100 != 0) or x.deadline.year % 400 == 0){
+      dias_mes[1] = dias_mes[1] + 1;
+    }
+    if(x.deadline.month>=1 && x.deadline.month<=12){
+      mes = x.deadline.month-1;
+      if(x.deadline.day>=1 && x.deadline.day<=dias_mes[mes]){
+        a=true;
+      }else{
+        error(ERR_DATE);
+      }
+    }else{
+      error(ERR_DATE);
+    }
+  }else{
+    error(ERR_DATE);
+  }
+  return a;
+}
+
+bool comprobarTiempo(Task x){
+  bool a;
+  if(x.time>=1 && x.time <=180){
+    a=true;
+  }else{
+    error(ERR_TIME);
+  }
+  return a;
+}
+
 void editProject(Project &toDoList){
   string pr= "project";
   
@@ -198,14 +234,12 @@ void deleteList(Project &toDoList){
 void addTask(Project &toDoList){
   string p="list";
   string tas;
-  string t="task";
   Task x;
   int b=0;
   char q;
   char c;
   int a;
-  int mes;
-  int dias_mes[]= {31, 28, 31, 30,31, 30, 31, 31, 30, 31, 30, 31};
+  bool corr;
   tas=comprobar(p);
 
   for(unsigned int i=0;i<toDoList.lists.size();i++){
@@ -222,31 +256,17 @@ void addTask(Project &toDoList){
     cout << "Enter deadline: ";
     cin >> x.deadline.day >> q >> x.deadline.month >> c >> x.deadline.year;
     // comprobacion de que la fecha introducida es correcta
-    if(x.deadline.year>=2000 && x.deadline.year<ANYMAX){
-      if((x.deadline.year % 4 == 0 and x.deadline.year % 100 != 0) or x.deadline.year % 400 == 0){
-        dias_mes[1] = dias_mes[1] + 1;
+    corr= comprobarFecha(x);
+    if(corr){
+      cout << "Enter expected time: ";
+      cin >> x.time;
+      corr=comprobarTiempo(x);
+      if(corr){
+        x.isDone=false;
+        toDoList.lists[a].tasks.push_back(x);
       }
-      if(x.deadline.month>=1 && x.deadline.month<=12){
-        mes = x.deadline.month-1;
-        if(x.deadline.day>=1 && x.deadline.day<=dias_mes[mes]){
-          cout << "Enter expected time: ";
-          cin >> x.time;
-          if(x.time>=1 && x.time <=180){
-            x.isDone=false;
-            toDoList.lists[a].tasks.push_back(x);
-
-          }else{
-            error(ERR_TIME);
-          }
-        }else{
-          error(ERR_DATE);
-        }
-      }else{
-        error(ERR_DATE);
-      }
-    }else{
-      error(ERR_DATE);
     }
+
   }else{
     error(ERR_LIST_NAME);
   }
@@ -463,7 +483,7 @@ void deleteProject(ToDo &x){
   cout <<"Enter project id: ";
   cin >> id;
   for(unsigned int i=0; i<x.projects.size();i++){
-    if(id==x.projects[i].nextId){
+    if(id==x.projects[i].id){
       x.projects.erase(x.projects.begin()+i);
       a=false;
     }
@@ -474,8 +494,72 @@ void deleteProject(ToDo &x){
 }
 
 void importProject(ToDo &x){
+  string nombreFichero;
+  char comprobar;
+  ifstream f1;
+  string texto;
+  Project fun;
   cout <<"Enter filename ";
-  
+  getline(cin,nombreFichero);
+  f1.open(nombreFichero.c_str());
+  if(f1.is_open()){
+    f1 >> comprobar;
+    if(comprobar=='<'){
+      f1 >> comprobar;
+      if(comprobar=='#'){
+        getline(f1,texto);
+        fun.name=texto;
+        f1 >> comprobar;
+        if(comprobar=='*'){
+          getline(f1,texto);
+          fun.description=texto;
+          f1 >> comprobar;
+        }
+        while(comprobar=='@' && comprobar!='>'){
+          Task tarea;
+          List lista;
+          char a;
+          string q;
+          bool corr;
+          char completo;
+          comprobar='\0';
+          getline(f1,texto);
+          lista.name=texto;
+          while(a!='@' && comprobar!='>'){
+            tarea.name="";
+            while(a!='|'){
+              tarea.name +=a;
+              f1.get(a);
+            }
+            f1 >> tarea.deadline.day >> a >> tarea.deadline.month >> a >> tarea.deadline.year;
+            corr= comprobarFecha(tarea);
+            if(corr){
+              f1 >> a >> completo >> a >> tarea.time;
+              corr=comprobarTiempo(tarea);
+              if(corr){
+                if(completo=='T'){
+                  tarea.isDone=true;
+                  lista.tasks.push_back(tarea);
+                }else{
+                  tarea.isDone=false;
+                  lista.tasks.push_back(tarea);
+                }
+              }
+            }
+            f1 >> comprobar;
+            a=comprobar;
+          }
+          a='\0';
+          fun.lists.push_back(lista);
+        }
+      }
+      fun.id=x.nextId;
+      x.nextId++;
+      x.projects.push_back(fun);
+    }
+  }else{
+    error(ERR_FILE);
+  }
 }
 void exportProject(ToDo &x){
 
