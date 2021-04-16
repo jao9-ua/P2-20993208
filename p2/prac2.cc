@@ -3,6 +3,8 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <stdio.h>
+#include <string.h>
 #include <cstdlib>
 
 
@@ -129,7 +131,7 @@ void showProjectMenu(){
 void showMainMenu(){
   cout << "1- Project menu" << endl
        << "2- Add project" << endl
-       << "3- Delete projects" << endl 
+       << "3- Delete project" << endl 
        << "4- Import projects" << endl
        << "5- Export projects" << endl
        << "6- Load data" << endl
@@ -157,7 +159,7 @@ string comprobar(string r){
 bool comprobarFecha(Task x){
   int mes;
   int dias_mes[]= {31, 28, 31, 30,31, 30, 31, 31, 30, 31, 30, 31};
-  bool a;
+  bool a=false;
   if(x.deadline.year>=2000 && x.deadline.year<ANYMAX){
     if((x.deadline.year % 4 == 0 and x.deadline.year % 100 != 0) or x.deadline.year % 400 == 0){
       dias_mes[1] = dias_mes[1] + 1;
@@ -179,7 +181,7 @@ bool comprobarFecha(Task x){
 }
 
 bool comprobarTiempo(Task x){
-  bool a;
+  bool a=false;
   if(x.time>=1 && x.time <=180){
     a=true;
   }else{
@@ -239,7 +241,7 @@ void addTask(Project &toDoList){
   char q;
   char c;
   int a;
-  bool corr;
+  bool corr=false;
   tas=comprobar(p);
 
   for(unsigned int i=0;i<toDoList.lists.size();i++){
@@ -479,7 +481,7 @@ void addProject(ToDo &x){
 }
 void deleteProject(ToDo &x){
   int id;
-  bool a;
+  bool a=true;
   cout <<"Enter project id: ";
   cin >> id;
   for(unsigned int i=0; i<x.projects.size();i++){
@@ -498,80 +500,293 @@ void importProject(ToDo &x){
   char comprobar;
   ifstream f1;
   string texto;
-  Project fun;
-  cout <<"Enter filename ";
+ 
+  cout <<"Enter filename: ";
   getline(cin,nombreFichero);
   f1.open(nombreFichero.c_str());
   if(f1.is_open()){
     f1 >> comprobar;
-    if(comprobar=='<'){
-      f1 >> comprobar;
-      if(comprobar=='#'){
-        getline(f1,texto);
-        fun.name=texto;
+    do{
+      if(comprobar=='>'){
         f1 >> comprobar;
-        if(comprobar=='*'){
+      }
+      while(comprobar=='<'){
+        f1 >> comprobar;
+        if(comprobar=='#'){
+          Project fun;
           getline(f1,texto);
-          fun.description=texto;
+          fun.name=texto;
           f1 >> comprobar;
-        }
-        while(comprobar=='@' && comprobar!='>'){
-          Task tarea;
-          List lista;
-          char a;
-          string q;
-          bool corr;
-          char completo;
-          comprobar='\0';
-          getline(f1,texto);
-          lista.name=texto;
-          while(a!='@' && comprobar!='>'){
-            tarea.name="";
-            while(a!='|'){
-              tarea.name +=a;
-              f1.get(a);
-            }
-            f1 >> tarea.deadline.day >> a >> tarea.deadline.month >> a >> tarea.deadline.year;
-            corr= comprobarFecha(tarea);
-            if(corr){
-              f1 >> a >> completo >> a >> tarea.time;
-              corr=comprobarTiempo(tarea);
+          if(comprobar=='*'){
+            getline(f1,texto);
+            fun.description=texto;
+            f1 >> comprobar;
+          }
+          while(comprobar=='@'){
+            List lista;
+            char a;
+            string q;
+            bool corr;
+            char completo;
+            comprobar='\0';
+            getline(f1,texto);
+            lista.name=texto;
+            while(a!='@' && comprobar!='>'){
+              Task tarea;
+              while(a!='|'){
+                if(a==comprobar){
+                  tarea.name +=a;
+                }
+                f1.get(a);
+                if(a!='|'){
+                  tarea.name +=a;
+                }
+                
+              }
+              f1 >> tarea.deadline.day >> a >> tarea.deadline.month >> a >> tarea.deadline.year;
+              corr= comprobarFecha(tarea);
               if(corr){
-                if(completo=='T'){
-                  tarea.isDone=true;
-                  lista.tasks.push_back(tarea);
-                }else{
-                  tarea.isDone=false;
-                  lista.tasks.push_back(tarea);
+                f1 >> a >> completo >> a >> tarea.time;
+                corr=comprobarTiempo(tarea);
+                if(corr){
+                  if(completo=='T'){
+                    tarea.isDone=true;
+                    lista.tasks.push_back(tarea);
+                  }else{
+                    tarea.isDone=false;
+                    lista.tasks.push_back(tarea);
+                  }
                 }
               }
+              f1 >> comprobar;
+              a=comprobar;
             }
-            f1 >> comprobar;
-            a=comprobar;
+            a='\0';
+            fun.lists.push_back(lista);
           }
-          a='\0';
-          fun.lists.push_back(lista);
+          fun.id=x.nextId;
+          x.nextId++;
+          x.projects.push_back(fun);
         }
+       
       }
-      fun.id=x.nextId;
-      x.nextId++;
-      x.projects.push_back(fun);
-    }
+    }while(!f1.eof());
+    f1.close();
   }else{
     error(ERR_FILE);
   }
 }
 void exportProject(ToDo &x){
-
+  char guardar;
+  int id;
+  bool a;
+  bool existe=false;
+  string nF;
+  ofstream fichero;
+  string str;
+  do{
+    cout << "Save all project [Y/N]?:";
+    cin >> guardar;
+  }while(guardar!='Y' && guardar!='y' && guardar!='N' && guardar!='n');
+  cin.ignore();
+  if(guardar=='N' || guardar=='n'){
+    cout << "Enter project id: ";
+    cin >> id;
+    a=true;
+    cin.ignore();
+  }
+ 
+  if(a){
+    for(unsigned int i=0;i<x.projects.size();i++){
+      if(id==x.projects[i].id){
+        existe=true;
+      }
+    }
+  }
+  if(existe || guardar=='Y' || guardar=='y'){
+    cout <<"Enter filename: ";
+    getline(cin, nF);
+    fichero.open(nF.c_str());
+    if(fichero.is_open()){
+      if(existe){
+        for(unsigned int d=0;d<x.projects.size();d++){
+          if(id==x.projects[d].id){
+            fichero << x.projects[d].name << endl;
+            fichero << x.projects[d].description << endl;
+            for(unsigned int i=0;i< x.projects[d].lists.size();i++){
+              fichero << x.projects[d].lists[i].name << endl;
+              for(unsigned int a=0;a<x.projects[d].lists[i].tasks.size();a++){
+                fichero << x.projects[d].lists[i].tasks[a].name << "|" << x.projects[d].lists[i].tasks[a].deadline.day << "/";
+                fichero << x.projects[d].lists[i].tasks[a].deadline.month << "/";
+                fichero << x.projects[d].lists[i].tasks[a].deadline.year << "|";
+                if(x.projects[d].lists[i].tasks[a].isDone){
+                  fichero << "T" << "|";
+                }else{
+                  fichero << "F" << "|";
+                }
+                fichero << x.projects[id].lists[i].tasks[a].time << endl;
+              }
+            }
+          }
+        }
+      }else{
+        for(unsigned int d=0;d<x.projects.size();d++){
+          fichero << x.projects[d].name << endl;
+          fichero << x.projects[d].description << endl;
+          for(unsigned int i=0;i<x.projects[d].lists.size();i++){
+            fichero << x.projects[d].lists[i].name << endl;
+            for(unsigned int a=0;a<x.projects[d].lists[i].tasks.size();a++){
+              fichero << x.projects[d].lists[i].tasks[a].name << "|";
+              fichero << x.projects[d].lists[i].tasks[a].deadline.day << "/";
+              fichero << x.projects[d].lists[i].tasks[a].deadline.month << "/";
+              fichero << x.projects[d].lists[i].tasks[a].deadline.year << "|";
+              if(x.projects[d].lists[i].tasks[a].isDone){
+                fichero << "T" << "/";
+              }else{
+                fichero << "F" << "/";
+              }
+              fichero << x.projects[d].lists[i].tasks[a].time << endl;
+            }
+          }
+        }
+      }
+      fichero.close();
+    }else{
+      error(ERR_FILE);
+    }
+  }else{
+    error(ERR_ID);
+  }
 }
+
 void loadData(ToDo &x){
+  string nombreFichero;
+  BinToDo p;
+  BinProject project;
+  BinList lista;
+  BinTask tarea;
+  
+  char comp;
+  cout << "Enter filename: " << endl;
+  getline(cin, nombreFichero);
+  ifstream fichero(nombreFichero.c_str(),ios::in | ios::binary);
+  if(fichero.is_open()){
+    do{
+      cout << "Confirm[Y/N]?: ";
+      cin >> comp;
+    }while(comp!='Y' && comp!='y' && comp!='X' && comp!='x');
+    if(comp=='Y' || comp=='y'){
+      x.projects.clear();
+      x.name.clear();
+      fichero.read((char *)&p, sizeof(p));
+      x.name=p.name;
 
-}
+      for(unsigned int i=0;i<p.numProjects;i++){
+        Project proyecto;
+        fichero.read((char*)&project, sizeof(project));
+        proyecto.name=project.name;
+        proyecto.description=project.description;
+
+        for(unsigned int b=0;b<project.numLists;b++){
+          List listp;
+          fichero.read((char*)&lista, sizeof(lista));
+          listp.name=lista.name;
+
+          for(unsigned int z=0;z<lista.numTasks;z++){
+            Task tareap;
+            fichero.read((char*)&tarea, sizeof(tarea));
+            tareap.name=tarea.name;
+            tareap.deadline.day=tarea.deadline.day;
+            tareap.deadline.month=tarea.deadline.month;
+            tareap.deadline.year=tarea.deadline.year;
+            tareap.isDone=tarea.isDone;
+            tareap.time=tarea.time;
+            listp.tasks.push_back(tareap);
+
+          }
+          proyecto.lists.push_back(listp);
+        }
+        proyecto.id=x.nextId;
+        x.nextId++;
+        x.projects.push_back(proyecto);
+      }
+
+    }
+    fichero.close();
+    }else{
+      error(ERR_FILE);
+    }
+  }
 void saveData(ToDo &x){
+  string nombreFichero;
+  ofstream fichero;
+  BinToDo p;
+  BinProject project;
+  BinList lista;
+  BinTask tarea;
 
+  cout << "Enter filename: ";
+  getline(cin,nombreFichero);
+  fichero.open(nombreFichero.c_str(),ios::binary);
+  if(fichero.is_open()){
+    strncpy(p.name,x.name.c_str(),KMAXNAME-1);
+    p.name[KMAXNAME-1]='\0';
+    p.numProjects=x.projects.size();
+    fichero.write((const char *)&p, sizeof(p));
+
+    for(unsigned int i=0;i<x.projects.size();i++){
+      strncpy(project.name,x.projects[i].name.c_str(),KMAXNAME-1);
+      project.name[KMAXNAME-1]='\0';
+
+      strncpy(project.description,x.projects[i].description.c_str(),KMAXDESC-1);
+      project.description[KMAXDESC-1]='\0';
+
+      fichero.write((const char *)&project, sizeof(project));
+
+      project.numLists=x.projects[i].lists.size();
+
+      for(unsigned int d=0;d<x.projects[i].lists.size();d++){
+        strncpy(lista.name,x.projects[i].lists[d].name.c_str(),KMAXNAME-1);
+        lista.name[KMAXNAME-1]='\0';
+
+        fichero.write((const char *)&lista, sizeof(lista));
+
+        lista.numTasks=x.projects[i].lists[d].tasks.size();
+
+        for(unsigned int z=0;z<x.projects[i].lists[d].tasks.size();z++){
+          strncpy(tarea.name,x.projects[i].lists[d].tasks[z].name.c_str(),KMAXNAME-1);
+          tarea.name[KMAXNAME-1]='\0';
+          tarea.deadline.day=x.projects[i].lists[d].tasks[z].deadline.day;
+          tarea.deadline.month=x.projects[i].lists[d].tasks[z].deadline.month;
+          tarea.deadline.year=x.projects[i].lists[d].tasks[z].deadline.year;
+          tarea.isDone=x.projects[i].lists[d].tasks[z].isDone;
+          tarea.time=x.projects[i].lists[d].tasks[z].time;
+
+          fichero.write((const char *)&tarea, sizeof(tarea));
+        }
+      }
+    }
+  }else{
+    error(ERR_FILE);
+  }
 }
 void summary(ToDo &x){
-
+  int contadortareas=0;
+  int contadorHechas=0;
+  for(unsigned int i=0;i<x.projects.size();i++){
+    cout << "(" << x.projects[i].id <<") "<< x.projects[i].name;
+    for(unsigned int b=0;b<x.projects[i].lists.size();b++){
+      for(unsigned int z=0;z<x.projects[i].lists[b].tasks.size();z++){
+        if(x.projects[i].lists[b].tasks[z].isDone){
+          contadorHechas=contadorHechas+1;
+          contadortareas=contadortareas+1;
+        }else{
+          contadortareas=contadortareas+1;
+        }
+      }
+    }
+    cout << " [" << contadorHechas << "/" << contadortareas << "]" << endl;
+  }
 }
 
 
